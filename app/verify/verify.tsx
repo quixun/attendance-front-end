@@ -1,4 +1,5 @@
 // import { v2 as cloudinary } from 'cloudinary';
+import axios from 'axios';
 import { CameraView, useCameraPermissions } from "expo-camera";
 import * as FileSystem from 'expo-file-system';
 import { Stack, useLocalSearchParams } from "expo-router";
@@ -36,10 +37,11 @@ export default function Verify() {
       const photo = await cameraRef.current.takePictureAsync();
       setPhotoCount(prevCount => prevCount + 1);
       setPhotoTaken(true);
- 
+
       try {
         const base64 = await FileSystem.readAsStringAsync(photo.uri, { encoding: 'base64' }); // Đọc ảnh dưới dạng base64
-        uploadImageOnCloud(`data:image/jpeg;base64,${base64}`)
+        uploadImageOnCloud(photo.uri)
+        // uploadImageOnCloud(`data:image/jpeg;base64,${base64}`)
         console.log('Upload thành công!');
       } catch (error) {
         console.error('Lỗi upload:', error);
@@ -48,35 +50,42 @@ export default function Verify() {
 
   };
 
-  const uploadImageOnCloud = (file: string) => {
+  const uploadImageOnCloud = async (file: string) => {
     const folderName = `${studentID}_${name}`;
-  
-    const xhr = new XMLHttpRequest();
-    xhr.open('POST', 'https://api.cloudinary.com/v1_1/dvaegokfq/image/upload');
+    console.log("file: ", file);
+    const formData = new FormData();
+    formData.append("image", file)
+    formData.append("folder", folderName)
+
+    const res = await axios.get("http://localhost:8000/upload")
+    console.log("res: ", file);
+    // xhr.open('POST', 'https://api.cloudinary.com/v1_1/dvaegokfq/image/upload');
+    // const xhr = new XMLHttpRequest();
+    // xhr.open('POST', 'https://api.cloudinary.com/v1_1/dvaegokfq/image/upload');
 
   
-    xhr.onload = () => {
-      if (xhr.status === 200) {
-        console.log('Upload thành công!');
-        setProgress((prevProgress) => {
-          const newProgress = (prevProgress + 1);        
-          return newProgress;
-        });
-        console.log('progress:::', progress);
+    // xhr.onload = () => {
+    //   if (xhr.status === 200) {
+    //     console.log('Upload thành công!');
+    //     setProgress((prevProgress) => {
+    //       const newProgress = (prevProgress + 1);        
+    //       return newProgress;
+    //     });
+    //     console.log('progress:::', progress);
         
         
-      } else {
-        console.error('Lỗi upload:', xhr.statusText);
-      }
-    };
+    //   } else {
+    //     console.error('Lỗi upload:', xhr.statusText);
+    //   }
+    // };
   
-    const data = new FormData();
-    data.append('file', file);
-    data.append("upload_preset", "snvlqaav");
-    data.append('cloud_name', 'dvaegokfq');
-    data.append('folder', folderName);
+    // const data = new FormData();
+    // data.append('file', file);
+    // data.append("upload_preset", "snvlqaav");
+    // data.append('cloud_name', 'dvaegokfq');
+    // data.append('folder', folderName);
   
-    xhr.send(data);
+    // xhr.send(data);
   }
 
   const startTakingPictures = () => {

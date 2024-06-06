@@ -17,6 +17,7 @@
   "dependencies": {
     "@expo/vector-icons": "^14.0.0",
     "@react-navigation/native": "^6.0.2",
+    "axios": "^1.7.2",
     "cloudinary": "^2.2.0",
     "cloudinary-react-native": "^1.0.0",
     "expo": "~51.0.9",
@@ -34,6 +35,7 @@
     "react": "18.2.0",
     "react-dom": "18.2.0",
     "react-native": "0.74.1",
+    "react-native-axios": "^0.17.1",
     "react-native-camera": "^4.2.1",
     "react-native-gesture-handler": "~2.16.1",
     "react-native-image-picker": "^7.1.2",
