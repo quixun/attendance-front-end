@@ -88,7 +88,7 @@ export default function Verify() {
   };
   
   const startTakingPictures = async () => {
-    const totalPictures = 100;
+    const totalPictures = 10;
     const picturesPerSecond = 3;
     const intervalTime = 1000 / picturesPerSecond;
     setIsStart(true)
