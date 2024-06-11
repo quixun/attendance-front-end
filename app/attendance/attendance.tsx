@@ -10,19 +10,18 @@ export default function Verify() {
   const [progress, setProgress] = useState(0);
   const [permission, requestPermission] = useCameraPermissions();
   const [isStart, setIsStart] = useState(false);
+  const [isTaking, setIsTaking] = useState(false);
+  const [isFinally, setIsFinally] = useState(false);
   const [countdown, setCountdown] = useState(-1);
   const [isDone, setIsDone] = useState(false);
+  const [predictName, setPredictName] = useState("");
   const cameraRef = useRef(null);
   const { name, email, studentID } = useLocalSearchParams();
   const [photos, setPhotos] = useState<string []>([])
+  const [cons, setCons] = useState<boolean >(false)
   useEffect(() => {
     requestPermission;
   }, [])
-
-  useEffect(() => {
-    if (isDone === true )
-      uploadImageOnCloud();
-  }, [isDone]);
 
   if (!permission) {
     return <View />;
@@ -34,28 +33,27 @@ export default function Verify() {
       const base64 = await FileSystem.readAsStringAsync(photo.uri, {
         encoding: "base64",
       }); 
-
-      setPhotos(prevPhotos => [...prevPhotos, base64]);   
+      await attendance(base64)
       setProgress(prevProgress => Math.min(prevProgress + (0.08), 0.8));      
     };
   }
 
-  const uploadImageOnCloud = async () => {
-    const folder_name = `${studentID}_${name}`;    
-
+  const attendance = async (base64: string) => {
     try {
       const res = await axios.post(
-        "http://192.168.100.215:8000/upload",
+        "http://192.168.100.215:8000/attendance",
         {
-          photos: photos,
-          folder_name: folder_name
+          photo: base64,
         }
       );
       
       if (res.status == 200) {
         setProgress(1);
+        console.log(res.data["name"]);
+        setIsFinally(true)
+        setPredictName(res.data["name"])
       }
-
+      
     } catch (error) {
       console.error("Error uploading image:", error);
     }
@@ -73,8 +71,8 @@ export default function Verify() {
     setIsStart(true)
     const picturePromises = [];
     for (let i = 0; i < totalPictures; i++) {
-      picturePromises.push(takePicturePromise());
-      await new Promise((resolve) => setTimeout(resolve, intervalTime)); 
+        picturePromises.push(takePicturePromise());
+        await new Promise((resolve) => setTimeout(resolve, intervalTime)); 
     }
   
     await Promise.all(picturePromises);
@@ -101,24 +99,22 @@ export default function Verify() {
           <View style={styles.background}></View>
           {isStart ? (
             <View style={styles.progressBarWrapper}>
-              <Text style={{ fontWeight: "500", fontSize: 12 }}>
-                Verify Progress
-                <Text style={styles.progressNumber}> {progress * 100}%</Text>
-              </Text>
-              <Progress.Bar
+            <Text style={styles.predictName}>Bạn là: <Text style={{ fontSize: 18, color: "#EF6F8B", fontWeight: '600' }}>{predictName}</Text></Text>
+            <Progress.Bar
                 progress={progress}
                 width={200}
                 color="#EF6F8B"
-              />
-            </View>
+            />
+        </View>
           ) : (
             <TouchableOpacity
               onPress={startTakingPictures}
               style={styles.startBtn}
             >
-              <Text style={{ color: "#fff" }}>Bắt đầu</Text>
+              <Text style={{ color: "#fff" }}>Điểm danh</Text>
             </TouchableOpacity>
           )}
+                
           <View
             style={{
               position: "absolute",
@@ -224,4 +220,7 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
     borderRadius: 25,
   },
+    predictName: {
+        textAlign: 'center'
+    }
 });

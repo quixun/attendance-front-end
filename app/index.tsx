@@ -89,7 +89,7 @@ export default function MainScreen() {
           <Text style={{ color: '#EF6F8B' }}> Or </Text>
           <View style={{ width: 50, height: 1, backgroundColor: '#EF6F8B' }}></View>
         </View>
-        <Link href={`/verify/verify?name=${name}&email=${email}&studentID=${studentID}`} asChild>
+        <Link href={`/attendance/attendance?name=${name}&email=${email}&studentID=${studentID}`} asChild>
           <TouchableOpacity style={{ height: 50, width: 300, backgroundColor: '#EF6F8B', flexDirection: 'column', justifyContent: 'center', borderRadius: 100 }}>
             <Text style={{ textAlign: 'center', color: '#fff' }}>Attendance now</Text>
           </TouchableOpacity>
