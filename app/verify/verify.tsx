@@ -42,14 +42,16 @@ export default function Verify() {
 
   const uploadImageOnCloud = async () => {
     const folder_name = `${studentID}_${name}`;    
-
+    const data = {
+      name: name,
+      "student_id": studentID,
+      email: email,
+      photos: photos
+    }
     try {
       const res = await axios.post(
         "http://192.168.100.215:8000/upload",
-        {
-          photos: photos,
-          folder_name: folder_name
-        }
+        data
       );
       
       if (res.status == 200) {
