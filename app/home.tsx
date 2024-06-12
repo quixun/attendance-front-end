@@ -8,7 +8,7 @@ const HomeScreen = () => {
       <Stack.Screen
         options={{ headerTransparent: true, headerTitle: "" }}
       ></Stack.Screen>
-      <View style={styles.container}>
+      <View>
         <Text>HomeScreen</Text>
       </View>
     </>
@@ -17,11 +17,4 @@ const HomeScreen = () => {
 
 export default HomeScreen;
 
-const styles = StyleSheet.create({
-  container: {
-    padding: 20,
-    flex: 1,
-    alignItems: "center",
-    backgroundColor: "#fff",
-  },
-});
+const styles = StyleSheet.create({});
