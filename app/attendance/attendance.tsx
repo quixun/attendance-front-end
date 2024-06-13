@@ -5,23 +5,55 @@ import { Stack, useLocalSearchParams } from "expo-router";
 import { useEffect, useRef, useState } from "react";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import * as Progress from 'react-native-progress';
+import Toast from "react-native-toast-message";
 let stt = 0;
 export default function Verify() {
   const [progress, setProgress] = useState(0);
   const [permission, requestPermission] = useCameraPermissions();
   const [isStart, setIsStart] = useState(false);
-  const [isTaking, setIsTaking] = useState(false);
-  const [isFinally, setIsFinally] = useState(false);
+  const [isAttendance, setIsAttendance] = useState(false);
   const [countdown, setCountdown] = useState(-1);
   const [isDone, setIsDone] = useState(false);
   const [predictName, setPredictName] = useState("");
   const cameraRef = useRef(null);
-  const { name, email, studentID } = useLocalSearchParams();
-  const [photos, setPhotos] = useState<string []>([])
-  const [cons, setCons] = useState<boolean >(false)
+  const { subjectId } = useLocalSearchParams();
+  const [names, setNames] = useState<string[]>([''])
+
+  const markAttendance = async (name: string) => {
+    try {      
+      const parts = name.split('_');
+
+      const data = {
+        student_id: parts[0],
+        subject_id: subjectId
+      }
+
+      const res = await axios.post(
+        "http://192.168.100.215:8000/mark-attendance",
+        data
+      );
+      setIsAttendance(true)
+    } catch (error) {
+      Toast.show({
+        type: 'error',
+        text1: 'Error',
+        text2: 'Attendance already marked for today 👋'
+      });      
+    }
+  }
+
   useEffect(() => {
     requestPermission;
   }, [])
+
+  useEffect(() => {
+    if (isDone) {      
+      const {name, percent} = getNameFinally(names)
+      setPredictName(name)
+      setProgress(percent)
+      markAttendance(name)
+    }
+  }, [isDone])
 
   if (!permission) {
     return <View />;
@@ -46,22 +78,47 @@ export default function Verify() {
           photo: base64,
         }
       );
-      
-      if (res.status == 200) {
-        setProgress(1);
-        console.log(res.data["name"]);
-        setIsFinally(true)
-        setPredictName(res.data["name"])
-      }
+      setNames(prev => [...prev, res.data["name"]])
+      setPredictName(res.data["name"])
       
     } catch (error) {
-      console.error("Error uploading image:", error);
+      Toast.show({
+        type: 'error',
+        text1: 'Error',
+        text2: 'No Face Detected 👋'
+      });
+      setNames(prev => [...prev, ""])
     }
   };
 
+  const getNameFinally = (data: string[]) => {
+    const counter = new Map<string, number>();
+    data.forEach(item => {
+        counter.set(item, (counter.get(item) || 0) + 1);
+    });
+
+    let maxElement = '';
+    let maxCount = 0;
+    counter.forEach((count, element) => {
+        if (count > maxCount) {
+            maxCount = count;
+            maxElement = element;
+        }
+    });
+    const newData = data.filter(item => item !== "")
+    let percent = maxCount / newData.length
+    
+    return {
+      name: maxElement,
+      percent
+    };
+};
+
+
+
+
   const takePicturePromise = async () => {
     await takePicture();
-    console.log('Picture taken');
   };
   
   const startTakingPictures = async () => {
@@ -103,7 +160,7 @@ export default function Verify() {
             <Progress.Bar
                 progress={progress}
                 width={200}
-                color="#EF6F8B"
+                color={isAttendance ? '#28a745' : '#EF6F8B'}
             />
         </View>
           ) : (
@@ -111,7 +168,7 @@ export default function Verify() {
               onPress={startTakingPictures}
               style={styles.startBtn}
             >
-              <Text style={{ color: "#fff" }}>Điểm danh</Text>
+              <Text style={{ color: "#fff" }}>Attendance</Text>
             </TouchableOpacity>
           )}
                 
@@ -130,6 +187,7 @@ export default function Verify() {
           </View>
         </CameraView>
       </View>
+      <Toast />
     </>
   );
 }
@@ -222,5 +280,17 @@ const styles = StyleSheet.create({
   },
     predictName: {
         textAlign: 'center'
-    }
+    },
+    toastContainer: {
+      paddingHorizontal: 16,
+      paddingVertical: 8,
+      marginTop: 16,
+      borderRadius: 4,
+      backgroundColor: '#E9ECEF',
+    },
+    toastMessage: {
+      fontSize: 14,
+      lineHeight: 20,
+      color: '#333',
+    },
 });

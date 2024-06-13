@@ -1,60 +1,123 @@
-import { Image, StyleSheet, Platform } from 'react-native';
+import { Link } from "expo-router";
+import { useState } from "react";
+import { StyleSheet, Text, TextInput, TouchableOpacity, View } from "react-native";
 
-import { HelloWave } from '@/components/HelloWave';
-import ParallaxScrollView from '@/components/ParallaxScrollView';
-import { ThemedText } from '@/components/ThemedText';
-import { ThemedView } from '@/components/ThemedView';
+export default function LoginScreen() {
+  const [focusState, setFocusState] = useState({
+    name: false,
+    email: false,
+    studentID: false,
+  });
 
-export default function HomeScreen() {
+  const [name, setName] = useState("")
+  const [studentID, setStudentID] = useState("")
+  const [email, setEmail] = useState("")
+
+  const handleFocus = (field: string) => {
+    setFocusState({ ...focusState, [field]: true });
+  };
+
+  const handleBlur = (field: string) => {
+    setFocusState({ ...focusState, [field]: false });
+  };
+
+  const handleChangeText = (field: string, value: string) => {
+    switch (field) {
+      case "name":
+        setName(value)
+        break;
+      case "email":
+        setEmail(value)
+        break;
+      case "studentID":
+        setStudentID(value)
+        break;
+      default:
+        break;
+    }
+  };
+
   return (
-    <ParallaxScrollView
-      headerBackgroundColor={{ light: '#A1CEDC', dark: '#1D3D47' }}
-      headerImage={
-        <Image
-          source={require('@/assets/images/partial-react-logo.png')}
-          style={styles.reactLogo}
+    <View style={styles.container}>
+      <View style={{ marginTop: 150, position: 'relative' }}>
+        <Text style={{ fontSize: 24, fontWeight: '600' }}>Login</Text>
+        <View style={{ width: 26, height: 3, backgroundColor: '#EF6F8B', position: 'absolute', bottom: 1, left: 2 }}></View>
+      </View>
+      <View style={styles.inputWrapper}>
+        <TextInput
+          placeholder="Enter your name"
+          style={[
+            styles.inputRegistration,
+            { borderColor: focusState.name ? "#EF6F8B" : "#b9b2b3" },
+          ]}
+          onFocus={() => handleFocus("name")}
+          onBlur={() => handleBlur("name")}
+          onChangeText={(text) => handleChangeText("name", text)}
+          value={name}
         />
-      }>
-      <ThemedView style={styles.titleContainer}>
-        <ThemedText type="title">Welcome!</ThemedText>
-        <HelloWave />
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 1: Try it</ThemedText>
-        <ThemedText>
-          Edit <ThemedText type="defaultSemiBold">app/(tabs)/index.tsx</ThemedText> to see changes.
-          Press{' '}
-          <ThemedText type="defaultSemiBold">
-            {Platform.select({ ios: 'cmd + d', android: 'cmd + m' })}
-          </ThemedText>{' '}
-          to open developer tools.
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 2: Explore</ThemedText>
-        <ThemedText>
-          Tap the Explore tab to learn more about what's included in this starter app.
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 3: Get a fresh start</ThemedText>
-        <ThemedText>
-          When you're ready, run{' '}
-          <ThemedText type="defaultSemiBold">npm run reset-project</ThemedText> to get a fresh{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> directory. This will move the current{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> to{' '}
-          <ThemedText type="defaultSemiBold">app-example</ThemedText>.
-        </ThemedText>
-      </ThemedView>
-    </ParallaxScrollView>
+        <TextInput
+          placeholder="Enter your email"
+          style={[
+            styles.inputRegistration,
+            { borderColor: focusState.email ? "#EF6F8B" : "#b9b2b3" },
+          ]}
+          onFocus={() => handleFocus("email")}
+          onBlur={() => handleBlur("email")}
+          onChangeText={(text) => handleChangeText("email", text)}
+          value={email}
+        />
+        <TextInput
+          placeholder="Enter your studentID"
+          style={[
+            styles.inputRegistration,
+            { borderColor: focusState.studentID ? "#EF6F8B" : "#b9b2b3" },
+          ]}
+          onFocus={() => handleFocus("studentID")}
+          onBlur={() => handleBlur("studentID")}
+          onChangeText={(text) => handleChangeText("studentID", text)}
+          value={studentID}
+        />
+      </View>
+      <View style={{ flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 20, marginTop: 40 }}>
+        <Link href={`/auth/get-started?name=${name}&email=${email}&studentID=${studentID}`} asChild>
+          <TouchableOpacity style={{ height: 50, width: 300, backgroundColor: '#EF6F8B', flexDirection: 'column', justifyContent: 'center', borderRadius: 100 }}>
+            <Text style={{ textAlign: 'center', color: '#fff' }}>Continue</Text>
+          </TouchableOpacity>
+        </Link>
+        <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 5 }}>
+          <View style={{ width: 50, height: 1, backgroundColor: '#EF6F8B' }}></View>
+          <Text style={{ color: '#EF6F8B' }}> Or </Text>
+          <View style={{ width: 50, height: 1, backgroundColor: '#EF6F8B' }}></View>
+        </View>
+        <Link href={`/index`} asChild>
+          <TouchableOpacity style={{ height: 50, width: 300, backgroundColor: '#EF6F8B', flexDirection: 'column', justifyContent: 'center', borderRadius: 100 }}>
+            <Text style={{ textAlign: 'center', color: '#fff' }}>Register</Text>
+          </TouchableOpacity>
+        </Link>
+      </View>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
   titleContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     gap: 8,
+  },
+  inputRegistration: {
+    borderColor: "#b9b2b3",
+    borderWidth: 1,
+    height: 50,
+    paddingHorizontal: 20,
+    borderRadius: 8,
+    width: 300,
+    color: "#6f6869",
+  },
+  inputWrapper: {
+    flexDirection: "column",
+    gap: 30,
+    marginTop: 50,
   },
   stepContainer: {
     gap: 8,
@@ -65,6 +128,42 @@ const styles = StyleSheet.create({
     width: 290,
     bottom: 0,
     left: 0,
-    position: 'absolute',
+    position: "absolute",
+  },
+  container: {
+    padding: 20,
+    flex: 1,
+    alignItems: "center",
+    backgroundColor: "#fff",
+  },
+  progressNumber: {
+    color: "#EF6F8B",
+  },
+  centerVertical: {
+    flexDirection: "column",
+    alignItems: "center",
+  },
+  circleBoxShadow: {
+    shadowColor: "rgba(0, 0, 0, 0.35)", 
+    shadowOffset: {
+      width: 0, 
+      height: 5, 
+    },
+    shadowOpacity: 0.35, 
+    shadowRadius: 15, 
+    elevation: 5,
+  },
+  fakeBlurCircle: {
+    width: 150,
+    height: 150,
+    borderRadius: 75,
+    shadowColor: "#32325D", 
+    shadowOffset: {
+      width: 0,
+      height: 50, 
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 100,
+    elevation: 5, 
   },
 });

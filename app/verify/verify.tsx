@@ -1,10 +1,11 @@
 import axios from "axios";
 import { CameraView, useCameraPermissions } from "expo-camera";
 import * as FileSystem from "expo-file-system";
-import { Stack, useLocalSearchParams } from "expo-router";
+import { Stack, router, useLocalSearchParams } from "expo-router";
 import { useEffect, useRef, useState } from "react";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import * as Progress from 'react-native-progress';
+import Toast from "react-native-toast-message";
 let stt = 0;
 export default function Verify() {
   const [progress, setProgress] = useState(0);
@@ -21,8 +22,19 @@ export default function Verify() {
 
   useEffect(() => {
     if (isDone === true )
-      uploadImageOnCloud();
+      handleRegister();
   }, [isDone]);
+
+  useEffect(() => {
+    if (progress == 1) { 
+      Toast.show({
+      type: "success",
+      text1: "Success",
+      text2: "Attendance successfully! 👋",
+    });
+      router.push("/home")
+    }
+  }, [progress])
 
   if (!permission) {
     return <View />;
@@ -40,17 +52,16 @@ export default function Verify() {
     };
   }
 
-  const uploadImageOnCloud = async () => {
-    const folder_name = `${studentID}_${name}`;    
+  const handleRegister = async () => {
     const data = {
       name: name,
       "student_id": studentID,
       email: email,
-      photos: photos
+      photos: photos,
     }
     try {
       const res = await axios.post(
-        "http://192.168.100.215:8000/upload",
+        "http://192.168.100.215:8000/register",
         data
       );
       
@@ -62,6 +73,8 @@ export default function Verify() {
       console.error("Error uploading image:", error);
     }
   };
+
+
 
   const takePicturePromise = async () => {
     await takePicture();

@@ -2,8 +2,12 @@ import { Link, Stack, useLocalSearchParams } from "expo-router";
 import { Image, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import * as Progress from "react-native-progress";
 
-export default function GetStartedScreen() {
-  const { name, email, studentID } = useLocalSearchParams();
+export default function IntroductionScreen() {
+  const { subjectName, subjectThumbnail, subjectId } = useLocalSearchParams();
+  const decodedSubjectName = decodeURIComponent(subjectName as string);
+  const decodedSubjectThumbnail = decodeURIComponent(subjectThumbnail as string);
+  const decodedSubjectId = decodeURIComponent(subjectId as string);
+  
   return (
     <>
       <Stack.Screen
@@ -33,7 +37,7 @@ export default function GetStartedScreen() {
             ]}
           >
             <Image
-              source={require("../../icons8-face-id-ios-17-outlined/icons8-face-id-100.png")}
+              source={{ uri: decodedSubjectThumbnail }}
             />
           </View>
         </View>
@@ -46,7 +50,7 @@ export default function GetStartedScreen() {
           }}
         >
           <Text style={{ fontSize: 28, fontWeight: 600 }}>
-            Face Verification
+            {decodedSubjectName}
           </Text>
           <Text
             style={{
@@ -59,10 +63,10 @@ export default function GetStartedScreen() {
             Your face will be scanned to verify your identity when signing in
           </Text>
         </View>
-        <Link href={`/verify/verify?name=${name}&email=${email}&studentID=${studentID}`} asChild>
+        <Link href={`/attendance/attendance?subjectId=${decodedSubjectId}`} asChild>
           <TouchableOpacity style={styles.verifyButton}>
             <Text style={{ textAlign: "center", color: "#fff" }}>
-              Verify My Face
+              Attendance now
             </Text>
           </TouchableOpacity>
         </Link>
