@@ -1,3 +1,4 @@
+import { env } from "@/env";
 import axios from "axios";
 import { CameraView, useCameraPermissions } from "expo-camera";
 import * as FileSystem from "expo-file-system";
@@ -61,7 +62,7 @@ export default function Verify() {
     }
     try {
       const res = await axios.post(
-        "http://192.168.100.215:8000/register",
+        `${env.REACT_NATIVE_API_URL}/register`,
         data
       );
       

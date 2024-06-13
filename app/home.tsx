@@ -1,5 +1,6 @@
 import Gradient from "@/components/Gradient";
 import SubjectCard from "@/components/SubjectCard";
+import { env } from "@/env";
 import axios from "axios";
 import { Stack } from "expo-router";
 import * as React from "react";
@@ -11,7 +12,7 @@ export default function HomeScreen() {
   const [keyword, setKeyword] = React.useState("");
   const [subjects, setSubjects] = React.useState("");
   const getSubjects = async () => {
-    const res = await axios.get("http://192.168.100.215:8000/get-subjects");
+    const res = await axios.get(`${env.REACT_NATIVE_API_URL}/get-subjects`);
     setSubjects(res.data.subjects)
   }
 

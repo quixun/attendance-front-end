@@ -1,3 +1,4 @@
+import { env } from "@/env";
 import axios from "axios";
 import { CameraView, useCameraPermissions } from "expo-camera";
 import * as FileSystem from "expo-file-system";
@@ -6,7 +7,7 @@ import { useEffect, useRef, useState } from "react";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import * as Progress from 'react-native-progress';
 import Toast from "react-native-toast-message";
-let stt = 0;
+
 export default function Verify() {
   const [progress, setProgress] = useState(0);
   const [permission, requestPermission] = useCameraPermissions();
@@ -29,7 +30,7 @@ export default function Verify() {
       }
 
       const res = await axios.post(
-        "http://192.168.100.215:8000/mark-attendance",
+        `${env.REACT_NATIVE_API_URL}/mark-attendance`,
         data
       );
       setIsAttendance(true)
@@ -73,7 +74,7 @@ export default function Verify() {
   const attendance = async (base64: string) => {
     try {
       const res = await axios.post(
-        "http://192.168.100.215:8000/attendance",
+        `${env.REACT_NATIVE_API_URL}/attendance`,
         {
           photo: base64,
         }
