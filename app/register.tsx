@@ -1,4 +1,5 @@
 import { Link, Stack } from "expo-router";
+import React from "react";
 import { useState } from "react";
 import {
   StyleSheet,
@@ -141,10 +142,7 @@ export default function MainScreen() {
               style={{ width: 50, height: 1, backgroundColor: "#EF6F8B" }}
             ></View>
           </View>
-          <Link
-            href={`/login`}
-            asChild
-          >
+          <Link href="/login" asChild>
             <TouchableOpacity
               style={{
                 height: 50,

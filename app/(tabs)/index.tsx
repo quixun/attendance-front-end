@@ -89,7 +89,7 @@ export default function LoginScreen() {
           <Text style={{ color: '#EF6F8B' }}> Or </Text>
           <View style={{ width: 50, height: 1, backgroundColor: '#EF6F8B' }}></View>
         </View>
-        <Link href={`/index`} asChild>
+        <Link href={`/`} asChild>
           <TouchableOpacity style={{ height: 50, width: 300, backgroundColor: '#EF6F8B', flexDirection: 'column', justifyContent: 'center', borderRadius: 100 }}>
             <Text style={{ textAlign: 'center', color: '#fff' }}>Register</Text>
           </TouchableOpacity>

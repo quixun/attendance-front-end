@@ -16,7 +16,7 @@ const subjectNameParam = encodeURIComponent(subject.name);
   const subjectIdParam = encodeURIComponent(subject.id);
   const handleUpload = async () => {
     const saved = await Promise.all(subjects.map(async (item, index) => {
-      const res = await axios.post("http://192.168.100.215:8000/add-subject", item);
+      const res = await axios.post("http://192.168.1.9:8000/add-subject", item);
       return res
     }))
   }

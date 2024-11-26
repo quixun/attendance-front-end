@@ -3,39 +3,35 @@ import axios from "axios";
 import { CameraView, useCameraPermissions } from "expo-camera";
 import * as FileSystem from "expo-file-system";
 import { Stack, router, useLocalSearchParams } from "expo-router";
+import React from "react";
 import { useEffect, useRef, useState } from "react";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
-import * as Progress from 'react-native-progress';
+import * as Progress from "react-native-progress";
 import Toast from "react-native-toast-message";
-let stt = 0;
+import CustomModal from "../../components/Modal";
 export default function Verify() {
   const [progress, setProgress] = useState(0);
   const [permission, requestPermission] = useCameraPermissions();
   const [isStart, setIsStart] = useState(false);
   const [countdown, setCountdown] = useState(-1);
   const [isDone, setIsDone] = useState(false);
-  const cameraRef = useRef(null);
+  const cameraRef = useRef<any>(null);
   const { name, email, studentID } = useLocalSearchParams();
-  const [photos, setPhotos] = useState<string []>([])
+  const [photos, setPhotos] = useState<string[]>([]);
+  const [isModalVisible, setIsModalVisible] = useState(false);
   useEffect(() => {
     requestPermission;
-  }, [])
+  }, []);
 
   useEffect(() => {
-    if (isDone === true )
-      handleRegister();
+    if (isDone === true) handleRegister();
   }, [isDone]);
 
   useEffect(() => {
-    if (progress == 1) { 
-      Toast.show({
-      type: "success",
-      text1: "Success",
-      text2: "Attendance successfully! 👋",
-    });
-      router.push("/home")
+    if (progress == 1) {
+      setIsModalVisible(true);
     }
-  }, [progress])
+  }, [progress]);
 
   if (!permission) {
     return <View />;
@@ -46,56 +42,68 @@ export default function Verify() {
 
       const base64 = await FileSystem.readAsStringAsync(photo.uri, {
         encoding: "base64",
-      }); 
+      });
 
-      setPhotos(prevPhotos => [...prevPhotos, base64]);   
-      setProgress(prevProgress => Math.min(prevProgress + (0.08), 0.8));      
-    };
-  }
+      setPhotos((prevPhotos) => [...prevPhotos, base64]);
+      setProgress((prevProgress) => Math.min(prevProgress + 0.08, 0.8));
+    }
+  };
 
   const handleRegister = async () => {
     const data = {
       name: name,
-      "student_id": studentID,
+      student_id: studentID,
       email: email,
       photos: photos,
-    }
+    };
     try {
       const res = await axios.post(
-        `${env.REACT_NATIVE_API_URL}/register`,
-        data
+        `${env.REACT_NATIVE_API_URL}/register/`,
+        data,
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
       );
-      
+
+      // const res = await axios.get(`${env.REACT_NATIVE_API_URL}/students`);
+
       if (res.status == 200) {
         setProgress(1);
       }
-
-    } catch (error) {
-      console.error("Error uploading image:", error);
+    } catch (error: any) {
+      Toast.show({
+        type: "error",
+        text1: error,
+        text2: "An error occurred while uploading the image.",
+      });
     }
   };
-
-
 
   const takePicturePromise = async () => {
     await takePicture();
-    console.log('Picture taken');
   };
-  
+
   const startTakingPictures = async () => {
     const totalPictures = 10;
-    const picturesPerSecond = 3;
+    const picturesPerSecond = 1;
     const intervalTime = 1000 / picturesPerSecond;
-    setIsStart(true)
+
+    setIsStart(true);
     const picturePromises = [];
     for (let i = 0; i < totalPictures; i++) {
-      picturePromises.push(takePicturePromise());
-      await new Promise((resolve) => setTimeout(resolve, intervalTime)); 
+      await takePicturePromise();
+      await new Promise((resolve) => setTimeout(resolve, intervalTime));
     }
-  
-    await Promise.all(picturePromises);
-    setIsDone(true); 
-  }
+
+    setIsDone(true);
+  };
+
+  const handleModalClose = () => {
+    setIsModalVisible(false);
+    router.push("/home");
+  };
 
   return (
     <>
@@ -121,11 +129,7 @@ export default function Verify() {
                 Verify Progress
                 <Text style={styles.progressNumber}> {progress * 100}%</Text>
               </Text>
-              <Progress.Bar
-                progress={progress}
-                width={200}
-                color="#EF6F8B"
-              />
+              <Progress.Bar progress={progress} width={200} color="#EF6F8B" />
             </View>
           ) : (
             <TouchableOpacity
@@ -150,6 +154,14 @@ export default function Verify() {
           </View>
         </CameraView>
       </View>
+      <CustomModal
+        isVisible={isModalVisible}
+        title="Attendance Marked"
+        message="You have successfully marked your attendance. Click OK to confirm."
+        onClose={() => setIsModalVisible(false)}
+        onConfirm={handleModalClose}
+        confirmText="OK"
+      />
     </>
   );
 }

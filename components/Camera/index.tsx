@@ -9,7 +9,6 @@ const CameraComponent = () => {
     const checkPermission = async () => {
         const newCameraPermission = await Camera.requestCameraPermission()
         const newMicroPhonePermission = await Camera.requestMicrophonePermission()
-        console.log(newCameraPermission);
     }
     
     return (
